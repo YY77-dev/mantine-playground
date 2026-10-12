@@ -41,8 +41,8 @@ export function LayoutShowcase() {
     <Section id="layout" title="レイアウト" description="要素の配置や余白を整えるコンポーネント">
       <Demo name="AppShell" description="このページの外枠">
         <Text size="sm">
-          ヘッダーと左の目次を含む、このページ全体の枠組みが AppShell
-          です。狭い画面では左上のハンバーガーで目次を開閉できます。
+          ヘッダー・左の目次・右のサイド欄・フッターを含む、このページ全体の枠組みが AppShell
+          です。狭い画面では左上のハンバーガーで目次を開閉できます。右のサイド欄は広い画面でだけ表示され、右上のボタンで開閉できます。
         </Text>
       </Demo>
 
@@ -167,7 +167,10 @@ export function LayoutShowcase() {
 
       <Demo name="Affix" description="画面の隅に固定">
         <Text size="sm">少しスクロールすると、右下に「上へ戻る」ボタンが表示されます。</Text>
-        <Affix position={{ bottom: 20, right: 20 }}>
+        {/* AppShell のフッターに重ならないよう、その高さぶん上にずらす */}
+        <Affix
+          position={{ bottom: 'calc(var(--app-shell-footer-offset, 0rem) + 20px)', right: 20 }}
+        >
           <Transition transition="slide-up" mounted={scroll.y > 300}>
             {(styles) => (
               <Button

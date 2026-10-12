@@ -2,10 +2,13 @@
 
 import {
   ActionIcon,
+  Anchor,
   AppShell,
   Burger,
+  Code,
   Group,
   ScrollArea,
+  Stack,
   TableOfContents,
   Text,
   Title,
@@ -13,7 +16,12 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconMoon, IconSun } from '@tabler/icons-react';
+import {
+  IconLayoutSidebarRightCollapse,
+  IconLayoutSidebarRightExpand,
+  IconMoon,
+  IconSun,
+} from '@tabler/icons-react';
 import { ButtonsShowcase } from './ButtonsShowcase';
 import { DataDisplayShowcase } from './DataDisplayShowcase';
 import { DatesShowcase } from './DatesShowcase';
@@ -47,17 +55,34 @@ function ColorSchemeToggle() {
   );
 }
 
+/** Aside に並べる、このページの AppShell を構成する部品 */
+const SHELL_PARTS = [
+  { name: 'AppShell.Header', description: 'タイトルとライト・ダークの切り替え' },
+  { name: 'AppShell.Navbar', description: '左の目次。狭い画面ではハンバーガーで開閉' },
+  { name: 'AppShell.Main', description: 'コンポーネントとフックの使用例' },
+  { name: 'AppShell.Aside', description: 'この欄。右上のボタンで開閉' },
+  { name: 'AppShell.Footer', description: '画面下に固定されたリンク' },
+];
+
 /** Mantine のコンポーネントとフックを一通り並べたショーケース */
 export function ShowcasePage() {
   const [navOpened, nav] = useDisclosure(false);
+  const [asideOpened, aside] = useDisclosure(true);
 
   return (
     <AppShell
       header={{ height: 60 }}
+      footer={{ height: 44 }}
       navbar={{
         width: 260,
         breakpoint: 'sm',
         collapsed: { mobile: !navOpened },
+      }}
+      // 本文の列が狭くならないよう、Aside は lg 以上の幅でだけ出す
+      aside={{
+        width: 260,
+        breakpoint: 'lg',
+        collapsed: { mobile: true, desktop: !asideOpened },
       }}
       padding="md"
     >
@@ -75,7 +100,22 @@ export function ShowcasePage() {
               Mantine ショーケース
             </Title>
           </Group>
-          <ColorSchemeToggle />
+          <Group gap="xs">
+            <ColorSchemeToggle />
+            <ActionIcon
+              variant="default"
+              size="lg"
+              visibleFrom="lg"
+              aria-label="右のサイド欄を開閉"
+              onClick={aside.toggle}
+            >
+              {asideOpened ? (
+                <IconLayoutSidebarRightCollapse size={18} />
+              ) : (
+                <IconLayoutSidebarRightExpand size={18} />
+              )}
+            </ActionIcon>
+          </Group>
         </Group>
       </AppShell.Header>
 
@@ -120,6 +160,40 @@ export function ShowcasePage() {
         <HooksDomShowcase />
         <HooksMiscShowcase />
       </AppShell.Main>
+
+      <AppShell.Aside p="md">
+        <Text size="xs" fw={700} c="dimmed" mb="xs">
+          このページの構成
+        </Text>
+        <AppShell.Section grow component={ScrollArea}>
+          <Stack gap="sm">
+            {SHELL_PARTS.map((part) => (
+              <div key={part.name}>
+                <Code>{part.name}</Code>
+                <Text size="sm" c="dimmed" mt={4}>
+                  {part.description}
+                </Text>
+              </div>
+            ))}
+          </Stack>
+        </AppShell.Section>
+      </AppShell.Aside>
+
+      <AppShell.Footer>
+        <Group h="100%" px="md" justify="space-between">
+          <Text size="xs" c="dimmed">
+            Mantine Playground
+          </Text>
+          <Group gap="md">
+            <Anchor href="https://mantine.dev" target="_blank" size="xs">
+              Mantine ドキュメント
+            </Anchor>
+            <Anchor href="https://tabler.io/icons" target="_blank" size="xs">
+              Tabler Icons
+            </Anchor>
+          </Group>
+        </Group>
+      </AppShell.Footer>
     </AppShell>
   );
 }
